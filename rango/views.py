@@ -2,7 +2,8 @@ from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from rango.models import Category, Page
 from rango.forms import UserForm, UserProfileForm, PageForm, CategoryForm
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse
+
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from datetime import datetime
@@ -28,11 +29,10 @@ def add_page(request, category_name_slug):
     context_dict = {'form':form, 'category': category}
     return render(request, 'rango/add_page.html', context_dict)
 
-
 def add_category(request):
-    form = CategoryForm()
-
-    if request.method == 'POST':
+	form = CategoryForm()
+	
+	if request.method == 'POST':
 		form = CategoryForm(request.POST)
 		if form.is_valid():
 			form.save(commit=True)
@@ -40,15 +40,16 @@ def add_category(request):
 		else:
 			print(form.errors)
 			
-    return render(request, 'rango/add_category.html', {'form': form})
+	return render(request, 'rango/add_category.html', {'form': form})
 
 def get_server_side_cookie(request, cookie, default_val=None):
     val = request.session.get(cookie)
     if not val:
         val = default_val
-    return val
+    return val
 
-def visitor_cookie_handler(request, response):
+
+def visitor_cookie_handler(request):
 
     visits = int(request.COOKIES.get('visits', '1'))
     last_visit_cookie = request.COOKIES.get('last_visit', str(datetime.now()))
@@ -81,13 +82,15 @@ def show_category(request, category_name_slug):
     return render(request, 'rango/category.html', context_dict)
 
 def index(request):
-    request.session.set_test_cookie()
+    request.session.set_test_cookie()
+
     category_list = Category.objects.order_by('-likes')[:5]
     page_list = Page.objects.order_by('-views')[:5]
     context_dict = {'categories':category_list, 'pages':page_list}
     
     visitor_cookie_handler(request)
-    context_dict['visits'] = request.session['visits']
+    context_dict['visits'] = request.session['visits']
+
 
     response = render(request, 'rango/index.html', context_dict)
     return response
@@ -145,19 +148,6 @@ def user_login(request):
     else:
         return render(request, 'rango/login.html', {})
 
-
-def restricted(request):
-    return HttpResponse("Since you're logged in, you can see this text!")
-    if request.method == 'POST':
-        form = CategoryForm(request.POST)
-
-        if form.is_valid():
-            form.save(commit=True)
-            return index(request)
-        else:
-            print(form.errors)
-    return render(request, 'rango/add_category.html', {'form': form})
-
 @login_required
 def restricted(request):
     return HttpResponse("Since you're logged in, you can see this text!")
@@ -165,4 +155,5 @@ def restricted(request):
 @login_required
 def user_logout(request):
     logout(request)
-    return HttpResponseRedirect(reverse('index'))
+    return HttpResponseRedirect(reverse('index'))
+
