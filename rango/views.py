@@ -31,15 +31,7 @@ def add_page(request, category_name_slug):
 def add_category(request):
     form = CategoryForm()
 
-    if request.method == 'POST':
-        form = CategoryForm(request.POST)
-
-        if form.is_valid():
-            form.save(commit=True)
-            return index(request)
-        else:
-            print(form.errors)
-    return render(request, 'rango/add_category.html', {'form': form})
+    
 
 def show_category(request, category_name_slug):
     context_dict = {}
@@ -106,6 +98,19 @@ def user_login(request):
             return HttpResponse("Invalid login details supplied.")
     else:
         return render(request, 'rango/login.html', {})
+
+@login_required
+def restricted(request):
+    return HttpResponse("Since you're logged in, you can see this text!")
+    if request.method == 'POST':
+        form = CategoryForm(request.POST)
+
+        if form.is_valid():
+            form.save(commit=True)
+            return index(request)
+        else:
+            print(form.errors)
+    return render(request, 'rango/add_category.html', {'form': form})
 
 @login_required
 def restricted(request):
