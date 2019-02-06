@@ -99,6 +99,8 @@ def about(request):
     if request.session.test_cookie_worked():
         print("TEST COOKIE WORKED!")
         request.session.delete_test_cookie()
+    print(request.method)
+    print(request.method)
     visitor_cookie_handler(request)
     context_dict = {'boldmessage':"Rango says here is the about page."}
     context_dict['visits'] = request.session['visits']
@@ -141,7 +143,7 @@ def user_login(request):
                 login(request, user)
                 return HttpResponseRedirect(reverse('index'))
             else:
-                return HttpResponse("Your Rango account is disabled")
+                return HttpResponse("Your Rango account is disabled.")
         else:
             print("Invalid login details: {0}, {1}".format(username, password))
             return HttpResponse("Invalid login details supplied.")
